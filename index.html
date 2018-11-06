@@ -21,28 +21,45 @@ exampleSocket.onmessage = e => {
 	var paintDetails = e.data.split(",");
 	x = paintDetails[0];
 	y = paintDetails[1];
-	console.log(x + "," + y);
+	//console.log(x + "," + y);
 	var cv = document.getElementById("publicCanvas");
 	var ctx = cv.getContext("2d");
 	var rect = cv.getBoundingClientRect();
 	var brushSize = 10;
 	var rgb = "black";
 	ctx.beginPath();
-	ctx.arc(x - rect.left,y - rect.top,brushSize,0,2*Math.PI);
+	var xLoc = x - rect.left;
+	var yLoc = y - rect.top;
+	ctx.arc(xLoc,yLoc,brushSize,0,2*Math.PI);
 	ctx.fillStyle=rgb;
 	ctx.fill();
+	
+	if (x==9999 && y==9999){
+		// then someone cleared the screen; so clear the screen
+		ctx.clearRect(0, 0, cv.width, cv.height);
+	}
 }
 function test(event){
 	exampleSocket.send(event.touches[0].clientX + "," + event.touches[0].clientY);
-	document.getElementById("saySomething").innerHTML = event.touches[0].clientX + "," + event.touches[0].clientY;
+}
+// request a (for now global) clearscreen from the server
+function reqClear(){
+	exampleSocket.send("9999,9999"); // code for "clear the screen globally"
 }
 </script>
 </head>
 <body>
-<p id="saySomething">Nothing to say</p>
+<!--            CANVAS           -->
 <canvas id="publicCanvas" width="800" height="600" style="border:1px solid #000000;" onmousedown="setDown()" onmouseup="setUp()" onmousemove="send(event)" ontouchmove="test(event)"></canvas>
-
-
+<br />
+<!--            CONTROLS         -->
+<button id="clearBtn" onclick="reqClear()">Clear</button>
+<button id="brushBtn">Brush</button>
+<button id="eraserBtn">Eraser</button>
+R:<input id="red" type="number" min="0" max="255" value="0"/>
+G:<input id="green" type="number" min="0" max="255" value="0"/>
+B:<input id="blue" type="number" min="0" max="255" value="0"/>
+<input id="slider" type="range" min="1" max="100" value="50">
 </body>
 </html>
 
