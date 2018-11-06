@@ -1,0 +1,48 @@
+<html>
+<head>
+<script>
+var mouseheld = false;
+var exampleSocket = new WebSocket("ws://192.168.1.102:9000");
+function send(event){
+	if(mouseheld){
+		exampleSocket.send(event.clientX + "," + event.clientY);
+	}
+}
+function setUp(){
+	mouseheld = false;
+	//console.log("mouse up")
+}
+function setDown(){
+	mouseheld = true;
+	//console.log("mouse down")
+}
+exampleSocket.onmessage = e => {
+	//console.log(e.data)
+	var paintDetails = e.data.split(",");
+	x = paintDetails[0];
+	y = paintDetails[1];
+	console.log(x + "," + y);
+	var cv = document.getElementById("publicCanvas");
+	var ctx = cv.getContext("2d");
+	var rect = cv.getBoundingClientRect();
+	var brushSize = 10;
+	var rgb = "black";
+	ctx.beginPath();
+	ctx.arc(x - rect.left,y - rect.top,brushSize,0,2*Math.PI);
+	ctx.fillStyle=rgb;
+	ctx.fill();
+}
+function test(event){
+	exampleSocket.send(event.touches[0].clientX + "," + event.touches[0].clientY);
+	document.getElementById("saySomething").innerHTML = event.touches[0].clientX + "," + event.touches[0].clientY;
+}
+</script>
+</head>
+<body>
+<p id="saySomething">Nothing to say</p>
+<canvas id="publicCanvas" width="800" height="600" style="border:1px solid #000000;" onmousedown="setDown()" onmouseup="setUp()" onmousemove="send(event)" ontouchmove="test(event)"></canvas>
+
+
+</body>
+</html>
+
