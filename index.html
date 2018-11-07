@@ -4,9 +4,10 @@
 var mouseheld = false;
 var exampleSocket = new WebSocket("ws://192.168.1.102:9000");
 var brushSize = 10;
+localStorage.setItem("brushSize", 10);
 function send(event){
 	if(mouseheld){
-		exampleSocket.send(event.clientX + "," + event.clientY + "," + brushSize);
+		exampleSocket.send(event.clientX + "," + event.clientY + "," + localStorage.brushSize);
 	}
 }
 function setUp(){
@@ -41,14 +42,15 @@ exampleSocket.onmessage = e => {
 	}
 }
 function test(event){
-	exampleSocket.send(event.touches[0].clientX + "," + event.touches[0].clientY + "," + brushSize);
+	exampleSocket.send(event.touches[0].clientX + "," + event.touches[0].clientY + "," + localStorage.brushSize);
 }
 // request a (for now global) clearscreen from the server
 function reqClear(){
 	exampleSocket.send("9999,9999"); // code for "clear the screen globally"
 }
-function changeBrushSize(){
-	brushSize = event.srcElement.value;
+function changeBrushSize(event){
+	localStorage.brushSize = event.srcElement.value;
+	//alert(localStorage.brushSize);
 }
 </script>
 </head>
