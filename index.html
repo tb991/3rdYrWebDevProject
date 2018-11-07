@@ -3,9 +3,10 @@
 <script>
 var mouseheld = false;
 var exampleSocket = new WebSocket("ws://192.168.1.102:9000");
+var brushSize = 10;
 function send(event){
 	if(mouseheld){
-		exampleSocket.send(event.clientX + "," + event.clientY);
+		exampleSocket.send(event.clientX + "," + event.clientY + "," + brushSize);
 	}
 }
 function setUp(){
@@ -21,11 +22,11 @@ exampleSocket.onmessage = e => {
 	var paintDetails = e.data.split(",");
 	x = paintDetails[0];
 	y = paintDetails[1];
+	brushSize = paintDetails[2];
 	//console.log(x + "," + y);
 	var cv = document.getElementById("publicCanvas");
 	var ctx = cv.getContext("2d");
 	var rect = cv.getBoundingClientRect();
-	var brushSize = 10;
 	var rgb = "black";
 	ctx.beginPath();
 	var xLoc = x - rect.left;
@@ -40,11 +41,14 @@ exampleSocket.onmessage = e => {
 	}
 }
 function test(event){
-	exampleSocket.send(event.touches[0].clientX + "," + event.touches[0].clientY);
+	exampleSocket.send(event.touches[0].clientX + "," + event.touches[0].clientY + "," + brushSize);
 }
 // request a (for now global) clearscreen from the server
 function reqClear(){
 	exampleSocket.send("9999,9999"); // code for "clear the screen globally"
+}
+function changeBrushSize(){
+	brushSize = event.srcElement.value;
 }
 </script>
 </head>
@@ -59,7 +63,7 @@ function reqClear(){
 R:<input id="red" type="number" min="0" max="255" value="0"/>
 G:<input id="green" type="number" min="0" max="255" value="0"/>
 B:<input id="blue" type="number" min="0" max="255" value="0"/>
-<input id="slider" type="range" min="1" max="100" value="50">
+<input id="slider" type="range" min="1" max="50" value="25" onchange="changeBrushSize(event)">
 </body>
 </html>
 
