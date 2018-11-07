@@ -28,6 +28,9 @@ var r1 = readline.createInterface({
 
 var connections = [];
 var connPtr = 0;
+// maintain an array of indexes of the above (connections) variable that indicates if the connection is dead
+var deadConnections = [];
+var deadConnPtr = 0;
 
 socket.on("request",function(request){
 	var currConn = request.accept(null,request.origin);
@@ -36,9 +39,20 @@ socket.on("request",function(request){
 	connPtr++;
 	
 	console.log(connPtr + " connections have been established.\n");
+
+	
 	
 	currConn.on("close",function(reasonCode,description){
-		console.log("currConn closed");
+		var identity;
+		for (i = 0; i < connections.length; i++){
+			if(connections[i]==this){
+				identity = i;
+			}
+		}
+		console.log(identity + " closed");
+		deadConnections[deadConnPtr] = identity;
+		deadConnPtr++;
+		console.log("Dead connections are: " + deadConnections);
 	});
 	currConn.on("message",function(message){
 		var identity;
