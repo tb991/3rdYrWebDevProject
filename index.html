@@ -8,12 +8,6 @@ localStorage.setItem("brushSize", 10);
 localStorage.setItem("red", 0);
 localStorage.setItem("green", 0);
 localStorage.setItem("blue", 0);
-function send(event){
-	if(mouseheld){
-		exampleSocket.send(event.clientX + "," + event.clientY + "," + localStorage.brushSize + "," + localStorage.red + ","
-			+ localStorage.green + "," + localStorage.blue);
-	}
-}
 function setUp(){
 	mouseheld = false;
 	//console.log("mouse up")
@@ -23,7 +17,7 @@ function setDown(){
 	//console.log("mouse down")
 }
 exampleSocket.onmessage = e => {
-	//console.log(e.data)
+	console.log(e.data)
 	var paintDetails = e.data.split(",");
 	x = paintDetails[0];
 	y = paintDetails[1];
@@ -44,8 +38,13 @@ exampleSocket.onmessage = e => {
 	ctx.fill();
 	
 	if (x==9999 && y==9999){
-		// then someone cleared the screen; so clear the screen
+		// 9999, 9999 is the code to clear the screen; so clear the screen
 		ctx.clearRect(0, 0, cv.width, cv.height);
+	}
+	else if(e.data[0]=="u"){
+		// u is the code to update the number of people - format is "u.numPeople."
+		var numPeople = e.data.split(".")[1];
+		document.getElementById("numPainters").innerHTML = numPeople;
 	}
 }
 var rgbToHex = function (rgb) { 
@@ -55,6 +54,7 @@ var rgbToHex = function (rgb) {
 	}
 	return hex;
 };
+// this sends the paintbrush details to the server, used by mobile devices
 function test(event){
 	exampleSocket.send(event.touches[0].clientX.toPrecision(3) + "," + event.touches[0].clientY.toPrecision(3) + "," + localStorage.brushSize + "," + localStorage.red + ","
 			+ localStorage.green + "," + localStorage.blue);
@@ -62,6 +62,13 @@ function test(event){
 // request a (for now global) clearscreen from the server
 function reqClear(){
 	exampleSocket.send("9999,9999"); // code for "clear the screen globally"
+}
+// sends the paintbrush information to the server
+function send(event){
+	if(mouseheld){
+		exampleSocket.send(event.clientX + "," + event.clientY + "," + localStorage.brushSize + "," + localStorage.red + ","
+			+ localStorage.green + "," + localStorage.blue);
+	}
 }
 function changeBrushSize(event){
 	localStorage.brushSize = event.srcElement.value;
@@ -100,7 +107,7 @@ G:<input id="green" type="number" min="0" max="255" value="0" onchange="changeGr
 B:<input id="blue" type="number" min="0" max="255" value="0" onchange="changeBlue(event)"/>
 <input id="slider" type="range" min="1" max="50" value="25" onchange="changeBrushSize(event)">
 <!--            FEEDBACK         -->
-<p>There are <span id="numPainters">1</span> painter(s) in this room.</p>
+<p>There are <span id="numPainters">0</span> painter(s) in this room.</p>
 </body>
 </html>
 
