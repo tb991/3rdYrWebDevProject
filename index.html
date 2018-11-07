@@ -76,6 +76,15 @@ function changeGreen(event){
 function changeBlue(event){
 	localStorage.blue = document.getElementById("blue").value;
 }
+function setBrushRGB(r, g, b){
+	localStorage.red = r;
+	localStorage.green = g;
+	localStorage.blue = b;
+	// now update the numeric input values
+	document.getElementById("red").value = r;
+	document.getElementById("green").value = g;
+	document.getElementById("blue").value = b;
+}
 </script>
 </head>
 <body>
@@ -84,8 +93,8 @@ function changeBlue(event){
 <br />
 <!--            CONTROLS         -->
 <button id="clearBtn" onclick="reqClear()">Clear</button>
-<button id="brushBtn">Brush</button>
-<button id="eraserBtn">Eraser</button>
+<button id="brushBtn" onclick="setBrushRGB(0,0,0)">Brush</button>
+<button id="eraserBtn" onclick="setBrushRGB(255,255,255)">Eraser</button>
 R:<input id="red" type="number" min="0" max="255" value="0" onchange="changeRed(event)"/>
 G:<input id="green" type="number" min="0" max="255" value="0" onchange="changeGreen(event)"/>
 B:<input id="blue" type="number" min="0" max="255" value="0" onchange="changeBlue(event)"/>
